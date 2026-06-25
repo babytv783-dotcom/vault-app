@@ -1,7 +1,10 @@
 // api.js — thin wrapper around fetch that attaches the login token
 // and handles errors consistently across the app.
 
-const BASE = '/api';
+// In production (deployed on Render), the frontend is a separate static
+// site from the backend, so it needs the backend's full URL. Locally,
+// the Vite dev server proxy (see vite.config.js) handles plain "/api".
+const BASE = import.meta.env.VITE_API_URL || '/api';
 
 function getToken() {
   return localStorage.getItem('vault_token');

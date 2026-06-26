@@ -44,7 +44,7 @@ export default function ChatView() {
         <div className="view-inner">
           {messages.length === 0 && (
             <div className="empty-state" style={{ height: '60vh' }}>
-              <i className="ti ti-message-circle"></i>
+              <span className="icon-glyph" style={{ fontSize: 28 }}>&#9679;</span>
               <div>Tell it about an account, or ask it something.</div>
             </div>
           )}
@@ -70,7 +70,7 @@ export default function ChatView() {
             disabled={sending}
           />
           <button type="submit" className="send-btn" disabled={sending || !input.trim()}>
-            <i className="ti ti-arrow-up"></i>
+            <span className="icon-glyph">&#8593;</span>
           </button>
         </div>
       </form>

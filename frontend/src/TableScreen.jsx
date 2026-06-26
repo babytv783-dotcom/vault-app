@@ -55,7 +55,7 @@ export default function TableScreen({ screen }) {
       <div className="main">
         <div className="topbar">
           <div className="topbar-title">
-            <i className="ti ti-table" style={{ color: 'var(--text-2)' }}></i> {screen.name}
+            <span className="icon-glyph" style={{ color: 'var(--text-2)' }}>&#9633;</span> {screen.name}
           </div>
         </div>
         <div className="view"><div className="empty-state" style={{ height: '60vh' }}>Loading...</div></div>
@@ -67,11 +67,11 @@ export default function TableScreen({ screen }) {
     <div className="main">
       <div className="topbar">
         <div className="topbar-title">
-          <i className="ti ti-table" style={{ color: 'var(--text-2)' }}></i> {screen.name}
+          <span className="icon-glyph" style={{ color: 'var(--text-2)' }}>&#9633;</span> {screen.name}
         </div>
         <div className="topbar-actions">
           <button className="pill-btn" onClick={load}>
-            <i className="ti ti-refresh"></i> Reload
+            <span className="icon-glyph">&#8634;</span> Reload
           </button>
         </div>
       </div>
@@ -95,13 +95,13 @@ export default function TableScreen({ screen }) {
                       {col.column_name}
                     </span>
                     <button className="col-delete" onClick={() => handleDeleteColumn(col.id)} title="Delete column">
-                      <i className="ti ti-x"></i>
+                      <span className="icon-glyph">&#10005;</span>
                     </button>
                   </th>
                 ))}
                 <th className="add-col-th">
                   <button className="add-col-btn" onClick={handleAddColumn} title="Add column">
-                    <i className="ti ti-plus"></i>
+                    <span className="icon-glyph">+</span>
                   </button>
                 </th>
               </tr>
@@ -121,7 +121,7 @@ export default function TableScreen({ screen }) {
                   ))}
                   <td className="add-col-spacer">
                     <button className="col-delete" style={{ opacity: 1, position: 'static' }} onClick={() => handleDeleteRow(row.id)} title="Delete row">
-                      <i className="ti ti-trash"></i>
+                      <span className="icon-glyph">&#10005;</span>
                     </button>
                   </td>
                 </tr>
@@ -130,11 +130,11 @@ export default function TableScreen({ screen }) {
           </table>
 
           <button className="add-row-btn" onClick={handleAddRow}>
-            <i className="ti ti-plus"></i> Add row
+            <span className="icon-glyph">+</span> Add row
           </button>
 
           <div className="table-footer-hint">
-            <i className="ti ti-pencil"></i>
+            <span className="icon-glyph">&#9998;</span>
             Click any cell or header to edit directly — or tell the assistant in chat and ask it to refresh this screen.
           </div>
         </div>

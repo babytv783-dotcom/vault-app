@@ -39,7 +39,7 @@ export default function NotesScreen({ screen }) {
     return (
       <div className="main">
         <div className="topbar">
-          <div className="topbar-title"><i className="ti ti-notes"></i> {screen.name}</div>
+          <div className="topbar-title"><span className="icon-glyph">&#9776;</span> {screen.name}</div>
         </div>
         <div className="view"><div className="empty-state" style={{ height: '60vh' }}>Loading...</div></div>
       </div>
@@ -50,11 +50,11 @@ export default function NotesScreen({ screen }) {
     <div className="main">
       <div className="topbar">
         <div className="topbar-title">
-          <i className="ti ti-notes" style={{ color: 'var(--text-2)' }}></i> {screen.name}
+          <span className="icon-glyph" style={{ color: 'var(--text-2)' }}>&#9776;</span> {screen.name}
         </div>
         <div className="topbar-actions">
           <button className="pill-btn primary" onClick={handleAddNote}>
-            <i className="ti ti-plus"></i> New note
+            <span className="icon-glyph">+</span> New note
           </button>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function NotesScreen({ screen }) {
         <div className="view-inner">
           {notes.length === 0 && (
             <div className="empty-state" style={{ height: '50vh' }}>
-              <i className="ti ti-notes"></i>
+              <span className="icon-glyph" style={{ fontSize: 28 }}>&#9776;</span>
               <div>No notes yet — click "New note" to add one.</div>
             </div>
           )}
@@ -87,7 +87,7 @@ export default function NotesScreen({ screen }) {
               <div className="note-meta">
                 <span>{new Date(note.updated_at).toLocaleDateString()} · editable</span>
                 <button className="note-delete" onClick={() => handleDelete(note.id)}>
-                  <i className="ti ti-trash"></i>
+                  <span className="icon-glyph">&#10005;</span>
                 </button>
               </div>
             </div>

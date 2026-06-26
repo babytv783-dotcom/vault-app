@@ -24,6 +24,7 @@ body{
   overflow:hidden;
 }
 .mono{font-family:'Space Mono',monospace;}
+.icon-glyph{display:inline-flex;align-items:center;justify-content:center;line-height:1;font-style:normal;}
 #root{height:100vh;}
 
 .app{display:grid;grid-template-columns:240px 1fr;height:100vh;overflow:hidden;}

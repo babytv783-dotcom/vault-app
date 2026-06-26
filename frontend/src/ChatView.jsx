@@ -54,11 +54,6 @@ export default function ChatView() {
               <div>
                 <div className="msg-name">{m.role === 'user' ? 'You' : 'Assistant'}</div>
                 <div className="msg-body">{m.content}</div>
-                {m.notices?.map((n, j) => (
-                  <div className="msg-note" key={j}>
-                    <i className="ti ti-check"></i> {n}
-                  </div>
-                ))}
               </div>
             </div>
           ))}

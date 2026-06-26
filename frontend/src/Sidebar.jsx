@@ -22,7 +22,7 @@ export default function Sidebar({ screens, activeView, onSelectChat, onSelectScr
       </div>
 
       <div className={`nav-item ${activeView === 'chat' ? 'active' : ''}`} onClick={onSelectChat}>
-        <i className="ti ti-message-circle"></i>
+        <span className="icon-glyph">&#9679;</span>
         <span>Chat</span>
       </div>
 
@@ -47,7 +47,7 @@ export default function Sidebar({ screens, activeView, onSelectChat, onSelectScr
             }}
             title="Delete screen"
           >
-            <i className="ti ti-trash"></i>
+            <span className="icon-glyph">&#10005;</span>
           </button>
         </div>
       ))}
@@ -82,7 +82,7 @@ export default function Sidebar({ screens, activeView, onSelectChat, onSelectScr
         </form>
       ) : (
         <button className="new-screen-btn" onClick={() => setCreating(true)}>
-          <i className="ti ti-plus"></i>
+          <span className="icon-glyph">+</span>
           <span>New screen</span>
         </button>
       )}
@@ -92,7 +92,7 @@ export default function Sidebar({ screens, activeView, onSelectChat, onSelectScr
         <span>Memory always on</span>
       </div>
       <button className="logout-btn" onClick={onLogout}>
-        <i className="ti ti-logout"></i> Log out
+        <span className="icon-glyph">&#8634;</span> Log out
       </button>
     </div>
   );

@@ -9,6 +9,7 @@
 const express = require('express');
 const Groq = require('groq-sdk');
 const pool = require('../db/pool');
+const { saveAccountToSheet } = require('../db/sheets');
 
 const router = express.Router();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -63,6 +64,30 @@ const tools = [
           screen_name: { type: 'string' },
         },
         required: ['screen_name'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'save_to_sheet',
+      description:
+        'Write an account\'s data into the connected Google Sheet. ' +
+        'Only call this when the user EXPLICITLY asks to save/sync something to the sheet — ' +
+        'never automatically after save_account_fact. Matches existing rows by email/username + game, ' +
+        'updating in place rather than duplicating.',
+      parameters: {
+        type: 'object',
+        properties: {
+          email: { type: 'string', description: 'Account email, if known.' },
+          username: { type: 'string', description: 'Account username, if known.' },
+          game: { type: 'string', description: 'The game this account belongs to.' },
+          fields: {
+            type: 'object',
+            description: 'Key/value fields to write, e.g. {"status": "deleted", "notes": "..."}',
+          },
+        },
+        required: ['game'],
       },
     },
   },
@@ -178,6 +203,7 @@ Rules:
 - When the user only asks a question and gives no new information, call get_all_accounts and answer in plain text — do NOT call save_account_fact in this case, even if you're restating fields that already exist.
 - Never call save_account_fact with a value that's identical to what's already stored — only call it when something is actually new or different.
 - Only call refresh_screen if the user explicitly names a screen and asks you to update/refresh it. Never call it automatically after saving a fact.
+- Only call save_to_sheet if the user explicitly asks to save/sync something to "the sheet" or "Google Sheet". Never call it automatically — saving to the database (save_account_fact) and saving to the sheet (save_to_sheet) are always separate, explicit actions.
 - Keep answers short and direct.`;
 
 router.post('/', async (req, res) => {
@@ -234,6 +260,13 @@ router.post('/', async (req, res) => {
       } else if (name === 'refresh_screen') {
         result = await refreshScreen(args.screen_name);
         if (result.ok) toolNotices.push(`Screen "${result.screen_name}" refreshed`);
+      } else if (name === 'save_to_sheet') {
+        try {
+          result = await saveAccountToSheet(args);
+          toolNotices.push(`Saved to Google Sheet: ${args.game}`);
+        } catch (err) {
+          result = { ok: false, error: `Could not write to the sheet: ${err.message}` };
+        }
       }
 
       messages.push({

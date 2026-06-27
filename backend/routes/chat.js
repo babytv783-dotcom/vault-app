@@ -91,6 +91,24 @@ const tools = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'find_account_by_email',
+      description:
+        'Look up a single account directly by its email address (or username). ' +
+        'Faster and more precise than get_all_accounts when the user gives a specific ' +
+        'email/username to look up — use this instead of get_all_accounts whenever ' +
+        'the user mentions a specific email or username.',
+      parameters: {
+        type: 'object',
+        properties: {
+          email: { type: 'string', description: 'The email to search for.' },
+          username: { type: 'string', description: 'The username to search for, if no email given.' },
+        },
+      },
+    },
+  },
 ];
 
 async function getAllAccounts() {
@@ -102,6 +120,37 @@ async function getAllAccounts() {
     byAccount[f.account_id][f.field_key] = f.field_value;
   }
   return accounts.rows.map((a) => ({ ...a, fields: byAccount[a.id] || {} }));
+}
+
+// Direct lookup by email or username — only fetches the matching
+// account(s) instead of pulling every account, so this stays fast
+// no matter how many accounts are stored.
+async function findAccountByEmail({ email, username }) {
+  if (!email && !username) {
+    return { found: false, error: 'No email or username given.' };
+  }
+  const accounts = await pool.query(
+    `select * from accounts where
+       (email is not null and email = $1) or (username is not null and username = $2)`,
+    [email || null, username || null]
+  );
+  if (accounts.rows.length === 0) {
+    return { found: false };
+  }
+  const accountIds = accounts.rows.map((a) => a.id);
+  const fields = await pool.query(
+    `select * from account_fields where account_id = any($1::uuid[])`,
+    [accountIds]
+  );
+  const byAccount = {};
+  for (const f of fields.rows) {
+    if (!byAccount[f.account_id]) byAccount[f.account_id] = {};
+    byAccount[f.account_id][f.field_key] = f.field_value;
+  }
+  return {
+    found: true,
+    accounts: accounts.rows.map((a) => ({ ...a, fields: byAccount[a.id] || {} })),
+  };
 }
 
 async function saveAccountFact({ email, username, game, fields }) {
@@ -201,6 +250,7 @@ const systemPrompt = `You are Vault, a personal assistant that ONLY organizes th
 Rules:
 - When the user tells you a NEW fact or a CHANGE about an account, call save_account_fact. Match accounts by email or username + game — if it already exists, this updates it, it does not duplicate it.
 - When the user only asks a question and gives no new information, call get_all_accounts and answer in plain text — do NOT call save_account_fact in this case, even if you're restating fields that already exist.
+- If the user asks about a SPECIFIC email or username (e.g. "tell me about abcd@gmail.com"), call find_account_by_email instead of get_all_accounts — it's faster and more precise for a single lookup.
 - Never call save_account_fact with a value that's identical to what's already stored — only call it when something is actually new or different.
 - Only call refresh_screen if the user explicitly names a screen and asks you to update/refresh it. Never call it automatically after saving a fact.
 - Only call save_to_sheet if the user explicitly asks to save/sync something to "the sheet" or "Google Sheet". Never call it automatically — saving to the database (save_account_fact) and saving to the sheet (save_to_sheet) are always separate, explicit actions.
@@ -257,6 +307,8 @@ router.post('/', async (req, res) => {
         toolNotices.push(`Saved: ${args.game} — ${Object.keys(args.fields || {}).join(', ')}`);
       } else if (name === 'get_all_accounts') {
         result = await getAllAccounts();
+      } else if (name === 'find_account_by_email') {
+        result = await findAccountByEmail(args);
       } else if (name === 'refresh_screen') {
         result = await refreshScreen(args.screen_name);
         if (result.ok) toolNotices.push(`Screen "${result.screen_name}" refreshed`);
